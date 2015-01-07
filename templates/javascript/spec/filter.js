@@ -5,8 +5,6 @@ describe('Filter: <%= cameledName %>', function () {
   // load the filter's module
   beforeEach(function () {
     module('<%= scriptAppName %>Internal');
-
-    //add your mocks here
   });
 
   // initialize a new instance of the filter before each test

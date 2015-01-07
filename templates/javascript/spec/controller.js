@@ -5,8 +5,6 @@ describe('Controller: <%= classedName %>Controller', function () {
   // load the controller's module
   beforeEach(function () {
     module('<%= scriptAppName %>Internal');
-
-    //add your mocks here
   });
 
   var <%= classedName %>Controller, scope;

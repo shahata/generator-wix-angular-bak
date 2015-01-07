@@ -8,7 +8,6 @@ describe('Service: <%= cameledName %>', function () {
     module(function (<%= cameledName %>Provider) {
       <%= cameledName %>Provider.setSalutation('Servus');
     });
-    //add your mocks here
   });
 
   // instantiate service

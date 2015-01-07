@@ -4,23 +4,19 @@
 
   /* @ngInject */
   function <%= cameledName %>Factory() {
-    var <%= cameledName %> = {};
+    function <%= classedName %>() {
+      var meaningOfLife = 42;
 
-    // Service logic
-    // ...
+      this.someMethod = function () {
+        return meaningOfLife;
+      };
+    }
 
-    var meaningOfLife = 42;
-
-    // Public API here
-    <%= cameledName %>.someMethod = function () {
-      return meaningOfLife;
-    };
-
-    return <%= cameledName %>;
+    return <%= classedName %>;
   }
 
   angular
     .module('<%= scriptAppName %>Internal')
-    .factory('<%= cameledName %>', <%= cameledName %>Factory);
+    .factory('<%= classedName %>', <%= cameledName %>Factory);
 
 })();

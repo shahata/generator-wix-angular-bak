@@ -1,16 +1,16 @@
 'use strict';
 
-describe('Service: <%= cameledName %>', function () {
+describe('Factory: <%= classedName %>', function () {
 
-  // load the service's module
+  // load the factory's module
   beforeEach(function () {
     module('<%= scriptAppName %>Internal');
   });
 
-  // instantiate service
+  // instantiate factory
   var <%= cameledName %>;
-  beforeEach(inject(function (_<%= cameledName %>_) {
-    <%= cameledName %> = _<%= cameledName %>_;
+  beforeEach(inject(function (<%= classedName %>) {
+    <%= cameledName %> = new <%= classedName %>();
   }));
 
   it('should do something', function () {
