@@ -16,7 +16,7 @@
   DO NOT TOUCH!!
   --------------
   #end
-  #set( $languages = ["de","en","es","fr","it","ja","ko","pl","pt","ru","tr","nl"] )
+  #set( $languages = ["de","en","es","fr","it","ja","ko","pl","pt","ru","tr","nl","da"] )
   #if( !$languages.contains($locale) )
     #set( $locale = "en" )
   #end
@@ -44,12 +44,6 @@
     <!-- endbuild -->
     <!-- end-process-tags -->
 
-    <!-- #if( false ) -->
-    <script>
-      /* jshint ignore:start */
-      ENABLE_MOCKS = ${enableMocks};
-    </script>
-    <!-- #end -->
     <% if (dashboardApp) { %>
     #parse('views/my-account/embeds_head.vm')
     <% } else { %>
@@ -92,7 +86,8 @@
     <script src="mock/server-api.js"></script>
     <!-- endbuild -->
     <script>
-      if (ENABLE_MOCKS) {
+      /* jshint ignore:start */
+      if (${enableMocks}) {
         angular.module('<%= scriptAppName %>').requires.push('<%= scriptAppName %>Mocks');
       }
     </script>
