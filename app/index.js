@@ -5,6 +5,9 @@ var angularUtils = require('../util.js');
 var spawn = require('child_process').spawn;
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
+var shell = require('shelljs');
+var Configstore = require('configstore');
+var packageName = require('../package').name;
 
 var Generator = module.exports = function Generator(args, options) {
   yeoman.generators.Base.apply(this, arguments);
@@ -187,6 +190,82 @@ Generator.prototype.askForModules = function askForModules() {
   }.bind(this));
 };
 
+Generator.prototype.requestPackgeDetails = function requestPackgeDetails() {
+
+  var that = this;
+  var conf = new Configstore(packageName);
+  var STORAGE_SETTINGS_KEY = 'wix_angular_settings';
+
+  function validateEmail(email) {
+    var pattern = /^([a-z0-9_\.\+-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+    return pattern.test(email);
+  }
+
+  function validateGroupId(groupId) {
+    var pattern = /com\.wixpress\.[^\.]+$/;
+    return pattern.test(groupId);
+  }
+
+  function validateDescription(desc) {
+    return desc.length <= 100;
+  }
+
+  var promptsDefaults = conf.get(STORAGE_SETTINGS_KEY);
+  if(promptsDefaults === undefined) {
+    promptsDefaults = {
+      owner: that.getGitConfigValue('user.name') || 'Shahar Talmi',
+      email: that.getGitConfigValue('user.email') || 'shahart@wix.com',
+      groupId: 'com.wixpress.cx'
+    };
+  }
+  promptsDefaults.description = that._.humanize(this.basename);
+
+  var promptForOwner = {
+    input: 'input',
+    name: 'owner',
+    message: 'Owner name',
+    default: promptsDefaults.owner
+  };
+
+  var promptForEmail = {
+    input: 'input',
+    name: 'email',
+    message: 'Owner email',
+    validate: validateEmail,
+    default: promptsDefaults.email
+  };
+
+  var promptForGroupId = {
+    type: 'input',
+    name: 'groupId',
+    message: 'Group ID',
+    validate: validateGroupId,
+    default: promptsDefaults.groupId
+  };
+
+  var promptForDescription = {
+    type: 'input',
+    name: 'description',
+    message: 'Project description (max 100 chars)',
+    validate: validateDescription,
+    default: promptsDefaults.description
+  };
+
+  var done = that.async();
+  that.prompt([promptForOwner, promptForEmail, promptForGroupId, promptForDescription], function (answers) {
+    var owner = {};
+    owner.owner = answers.owner;
+    owner.email = answers.email;
+    owner.description = answers.description;
+    owner.groupId = answers.groupId;
+
+    that.ownerCredentials = owner;
+    conf.set(STORAGE_SETTINGS_KEY, owner);
+    done();
+
+  });
+};
+
 Generator.prototype.readIndex = function readIndex() {
   this.indexFile = this.engine(this.read('../../templates/common/index.html').replace(/\$\{/g, '(;$};)'),
       this).replace(/\(;\$\};\)/g, '${');
@@ -288,9 +367,28 @@ Generator.prototype.createIndexHtml = function createIndexHtml() {
   }
 };
 
-Generator.prototype.packageFiles = function () {
+Generator.prototype.getGitConfigValue = function (cmd) {
+
+  var result = null;
+  if (shell.which('git')) {
+    result = shell.exec('git config --get ' + cmd, { silent: true }).output.trim();
+  }
+
+  return result;
+};
+
+
+Generator.prototype.packageFiles = function packageFiles() {
+
+  var owner = this.ownerCredentials;
+
   var pom = this.read('../../templates/common/pom.xml', 'utf8').replace(/\$\{/g, '(;$};)');
-  this.write('pom.xml', this.engine(pom, this).replace(/\(;\$\};\)/g, '${'));
+  this.write('pom.xml', this.engine(pom, this)
+    .replace(/\(;\$\};\)/g, '${')
+    .replace('{{projectOwner}}', owner.owner)
+    .replace('{{projectOwnerEmail}}', owner.email)
+    .replace('{{projectOwnerGroupId}}', owner.groupId)
+    .replace('{{projectOwnerDescription}}', owner.description));
 
   var replace = this.read('../../templates/common/replace.conf.js', 'utf8').replace(/\$\{/g, '(;$};)');
   this.write('replace.conf.js', this.engine(replace, this).replace(/\(;\$\};\)/g, '${'));
