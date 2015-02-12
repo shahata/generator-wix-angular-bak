@@ -1,1 +1,1 @@
-https://github.com/wix/academy/wiki/Wix-Angular-Introduction/
+https://github.com/wix/academy/wiki/Wix-Angular-Introduction/ aa
